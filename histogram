@@ -63,7 +63,22 @@ BEGIN {
   }
 }
 
+
 {	
+  # Calculate max.
+  if (NR==1) {
+    max=$1
+  } else { 
+    max=(max>$1)?max:$1
+  }
+
+  # Calculate min.
+  if (NR==1) {
+    min=$1
+  } else { 
+    min=(min>$1)?$1:min
+  }
+
   for (i=1;i<=n;i++) {
     if ($1 < bins[i]) {
       h[i]++
@@ -72,25 +87,26 @@ BEGIN {
   }
 }
 
+
 END {
-  # Max.
-  max=0	
+  # Max length of bar. Used for scaling.
+  max_bar=0	
   for (i=1;i<=n;i++) {
-    if (h[i]>max) {
-      max=h[i]
+    if (h[i]>max_bar) {
+      max_bar=h[i]
     }
   }
 
   # Scale.
   if (scale=="") {
-    scale=max
+    scale=max_bar
     if (scale>50) {
       scale=50
     }
   }
 
   # Output.
-  printf "\n"
+  printf "\nmin = %.2f\nmax = %.2f\n\n", min, max
   if (reverse==0) {
     last=bins[1]
     for (j=2;j<=n;j++) {
@@ -108,7 +124,7 @@ END {
 
 function print_bins(from, to, value) {
     printf "%*s - %*s: ", leng, from,leng, to
-    h_scaled=(value/max)*scale
+    h_scaled=(value/max_bar)*scale
     for (k=0;k<int(h_scaled);k++) {
       printf "█"
     }
